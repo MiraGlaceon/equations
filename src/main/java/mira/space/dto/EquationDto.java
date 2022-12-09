@@ -1,9 +1,11 @@
 package mira.space.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class EquationDto {
-    private Double x1;
-    private Double x2;
+    private double x1;
+    private double x2;
 }
