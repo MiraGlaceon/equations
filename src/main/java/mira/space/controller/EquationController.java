@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import mira.space.controller.exception.RootsNotFoundException;
+import mira.space.dto.EquationCoefficientsDto;
 import mira.space.dto.EquationDto;
 import mira.space.model.Equation;
 import mira.space.model.repo.EquationRepository;
@@ -35,13 +36,16 @@ public class EquationController {
             @ApiResponse(responseCode = "200", description = "Корни успешно получены",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EquationDto.class))}),
             @ApiResponse(responseCode = "204", description = "Не удалось получить корни из БД",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Введены некорректные данные",
                     content = @Content)
     })
     @GetMapping("/equation")
-    public ResponseEntity<EquationDto> getEquationByCoefficients(@RequestParam double a,
-                                                                 @RequestParam double b,
-                                                                 @RequestParam double c) {
-        Optional<Equation> optionalEquation = equationRepository.findByCoefficients(a, b, c);
+    public ResponseEntity<EquationDto> getEquationByCoefficients(@RequestBody EquationCoefficientsDto coeffs) {
+        if (coeffs == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Optional<Equation> optionalEquation = equationRepository.findByCoefficients(coeffs.getA(), coeffs.getB(), coeffs.getC());
         if (optionalEquation.isPresent()) {
             Equation equation = optionalEquation.get();
             return ResponseEntity.ok(new EquationDto(equation.getX1(), equation.getX2()));

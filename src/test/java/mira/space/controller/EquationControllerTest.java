@@ -1,6 +1,7 @@
 package mira.space.controller;
 
 import mira.space.controller.exception.RootsNotFoundException;
+import mira.space.dto.EquationCoefficientsDto;
 import mira.space.dto.EquationDto;
 import mira.space.model.Equation;
 import mira.space.model.repo.EquationRepository;
@@ -29,12 +30,14 @@ public class EquationControllerTest {
         Equation equation = equationService.solveEquation(a, b, c);
         equationRepository.save(equation);
 
+        EquationCoefficientsDto equationCoefficientsDto = new EquationCoefficientsDto(a,b,c);
         ResponseEntity<EquationDto> expected = ResponseEntity.ok(new EquationDto(equation.getX1(), equation.getX2()));
-        ResponseEntity<EquationDto> actual = equationController.getEquationByCoefficients(a, b, c);
+        ResponseEntity<EquationDto> actual = equationController.getEquationByCoefficients(equationCoefficientsDto);
         Assertions.assertEquals(expected, actual);
 
         double different = 5;
-        actual = equationController.getEquationByCoefficients(different, b, c);
+        equationCoefficientsDto.setA(different);
+        actual = equationController.getEquationByCoefficients(equationCoefficientsDto);
         Assertions.assertNotEquals(expected, actual);
     }
 
