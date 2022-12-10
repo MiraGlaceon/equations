@@ -1,5 +1,12 @@
 package mira.space.controller;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import mira.space.controller.exception.RootsNotFoundException;
 import mira.space.dto.EquationDto;
 import mira.space.model.Equation;
@@ -13,14 +20,24 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
+@OpenAPIDefinition(info = @Info(
+        title = "Примерный API для Аксиоматики",
+        description = "Решает квадратные уравнения вида ax^2 + bx + c = 0"))
 public class EquationController {
 
     @Autowired
-    EquationRepository equationRepository;
+    private EquationRepository equationRepository;
     @Autowired
-    EquationService equationService;
+    private EquationService equationService;
 
-    @GetMapping("/equations")
+    @Operation(summary = "Получить корни уравнения по коэффициентам из базы данных")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Корни успешно получены",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EquationDto.class))}),
+            @ApiResponse(responseCode = "204", description = "Не удалось получить корни из БД",
+                    content = @Content)
+    })
+    @GetMapping("/equation")
     public ResponseEntity<EquationDto> getEquationByCoefficients(@RequestParam double a,
                                                                  @RequestParam double b,
                                                                  @RequestParam double c) {
@@ -32,7 +49,14 @@ public class EquationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/equations")
+    @Operation(summary = "Решить уравнение и результат записать в базу")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Уравнение решено и записано в базу",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Equation.class))}),
+            @ApiResponse(responseCode = "422", description = "Уравнение не имеет корней",
+                    content = @Content)
+    })
+    @PostMapping("/equation")
     public ResponseEntity<Equation> postEquationWithCoefficients(@RequestParam double a,
                                                                  @RequestParam double b,
                                                                  @RequestParam double c) {

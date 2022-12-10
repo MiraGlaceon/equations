@@ -12,7 +12,7 @@ import java.util.Optional;
 public class EquationServiceImpl implements EquationService {
 
     @Autowired
-    EquationRepository equationRepository;
+    private EquationRepository equationRepository;
 
     @Override
     public Equation solveEquation(double a, double b, double c) {
